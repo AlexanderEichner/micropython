@@ -22,7 +22,7 @@ INC += -I$(BUILD)
 ifeq ($(CROSS), 1)
 DFU = $(TOP)/tools/dfu.py
 PYDFU = $(TOP)/tools/pydfu.py
-CFLAGS_PSP = -DIN_PSP -mthumb -msoft-float -fsingle-precision-constant -Wdouble-promotion  -march=armv7ve
+CFLAGS_PSP = -DIN_PSP -mthumb -msoft-float -fsingle-precision-constant -Wdouble-promotion  -march=armv7-a
 CFLAGS = $(INC) -Wall -std=c99 -nostdlib $(CFLAGS_PSP) $(COPT)
 LDFLAGS = -nostdlib -T amd-psp.ld
 SRC_BOARD_O = lib/utils/gchelper_a7.o
@@ -42,7 +42,11 @@ CFLAGS += -O2 -g
 CFLAGS += -fdata-sections -ffunction-sections
 endif
 
-LIBS =
+LIBGCC_FILE_NAME = $(shell $(CC) $(CFLAGS) -print-libgcc-file-name)
+LIBM_FILE_NAME   = $(shell $(CC) $(CFLAGS) -print-file-name=libm.a)
+
+LIBS  = -L $(dir $(LIBM_FILE_NAME)) -lm
+LIBS += -L $(dir $(LIBGCC_FILE_NAME)) -lgcc
 
 SRC_C = \
 	main.c \
